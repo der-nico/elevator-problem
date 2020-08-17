@@ -1,0 +1,31 @@
+﻿<Properties StartupConfiguration="{20829B58-4731-4382-8867-C1908BE652E5}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AVAMAE_elevator/Queue.cs">
+    <Files>
+      <File FileName="AVAMAE_elevator/Program.cs" Line="80" Column="9" />
+      <File FileName="AVAMAE_elevator/Building.cs" />
+      <File FileName="AVAMAE_elevator/Elevator.cs" />
+      <File FileName="AVAMAE_elevator/Queue.cs" Line="157" Column="32" />
+      <File FileName="AVAMAE_elevator/Command.cs" />
+      <File FileName="AVAMAE_elevator/CSVinput.cs" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="AVAMAE_elevator" expanded="True">
+            <Node name="AVAMAE_elevator" expanded="True">
+              <Node name="Dependencies" expanded="True" />
+              <Node name="Queue.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.AVAMAE__elevator PreferredExecutionTarget="MonoDevelop.Default" />
+</Properties>

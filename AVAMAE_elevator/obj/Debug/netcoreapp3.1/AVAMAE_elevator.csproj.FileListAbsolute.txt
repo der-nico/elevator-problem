@@ -1,0 +1,12 @@
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/bin/Debug/netcoreapp3.1/AVAMAE_elevator.deps.json
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/bin/Debug/netcoreapp3.1/AVAMAE_elevator.runtimeconfig.json
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/bin/Debug/netcoreapp3.1/AVAMAE_elevator.runtimeconfig.dev.json
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/bin/Debug/netcoreapp3.1/AVAMAE_elevator.dll
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/bin/Debug/netcoreapp3.1/AVAMAE_elevator.pdb
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/obj/Debug/netcoreapp3.1/AVAMAE_elevator.csprojAssemblyReference.cache
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/obj/Debug/netcoreapp3.1/AVAMAE_elevator.AssemblyInfoInputs.cache
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/obj/Debug/netcoreapp3.1/AVAMAE_elevator.AssemblyInfo.cs
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/obj/Debug/netcoreapp3.1/AVAMAE_elevator.csproj.CoreCompileInputs.cache
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/obj/Debug/netcoreapp3.1/AVAMAE_elevator.dll
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/obj/Debug/netcoreapp3.1/AVAMAE_elevator.pdb
+/Users/nicolasscharmberg/Projects/AVAMAE_elevator/AVAMAE_elevator/obj/Debug/netcoreapp3.1/AVAMAE_elevator.genruntimeconfig.cache

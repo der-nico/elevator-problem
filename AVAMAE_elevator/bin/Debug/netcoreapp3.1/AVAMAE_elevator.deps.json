@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "AVAMAE_elevator/1.0.0": {
+        "runtime": {
+          "AVAMAE_elevator.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "AVAMAE_elevator/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
