@@ -70,24 +70,31 @@ namespace AVAMAE_elevator
             }
             if (deltaFloor == 0)
             {
+                // Remove diviosn by 0 
+                // In case the elvator is on this floor
+                // the task will be performed if possible and the priority is not necessary
                 deltaFloor = 1;
             }
             return deltaFloor;
         }
-        public bool GetDirectionUp(int floor)
+        public int GetDirection(int floor)
         {
             if (PickedUp)
             {
-                return floor < floorTo;
+                return (floor < floorTo) ? 1 : -1;
             }
             else
             {
-                return floor < floorFrom;
+                return (floor < floorFrom) ? 1 : -1;
             }
         }
 
-        public double GetPriority(int t)
+        public double GetPriority(int t, Queue queue, int currentFloor, int floorFrom)
         {
+            if (!queue.HasSpace(currentFloor, this))
+            {
+                return 0.0;
+            }
             double priority = 1.0;
             int deltaFloor = GetDeltaFloor();
             priority = priority / (deltaFloor);

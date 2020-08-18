@@ -9,4 +9,9 @@
     <Compile Remove="EmptyClass.cs" />
     <Compile Remove="Request.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="data.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

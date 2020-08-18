@@ -9,6 +9,7 @@ namespace AVAMAE_elevator
         int direction = 0;
         bool atFloor = true;
         int timeMoveStart = -1;
+        int timeFinishedNextTask = -1;
         public Queue queue;
         static int timeForFloor = 10;
 
@@ -19,7 +20,7 @@ namespace AVAMAE_elevator
             currentFloor = 0;
             direction = 0;
         }
-        public Elevator(Elevator elevator)
+        public Elevator(Elevator elevator, int time)
         {
             // Copy constructor
             currentFloor = elevator.currentFloor;
@@ -31,6 +32,8 @@ namespace AVAMAE_elevator
             {
                 queue.AddCommand(command);
             }
+
+            timeFinishedNextTask = GetNextTaskEndTime(time);
 
         }
 
@@ -66,12 +69,14 @@ namespace AVAMAE_elevator
 
             }
             ExecuteNextTask(time);
+            timeFinishedNextTask = GetNextTaskEndTime(time);
         }
 
-        public Command NextTask(int time, int currentFloor)
+        public Command NextTask(int time)
         {
             // Get next task in queue
-            return queue.GetNextTask(time, currentFloor);
+
+            return queue.GetNextTask(time, currentFloor, direction);
         }
         public void ExecuteNextTask(int time)
         {
@@ -81,7 +86,7 @@ namespace AVAMAE_elevator
                 direction = 0;
                 return;
             }
-            Command task = NextTask(time, currentFloor);
+            Command task = NextTask(time);
             if (timeMoveStart == -1)
             {
                 timeMoveStart = time;
@@ -118,7 +123,7 @@ namespace AVAMAE_elevator
             {
                 return 0;
             }
-            Command task = NextTask(time, currentFloor);
+            Command task = NextTask(time);
             int timeToComplete = task.GetExecutionTime(currentFloor);
 
             timeToComplete += timeMoveStart - time;
@@ -136,11 +141,16 @@ namespace AVAMAE_elevator
         { 
             return this.currentFloor;
         }
-        public void AddTask(Command command)
+        public bool ArrivedAtFloor(int time)
+        {
+            return (timeFinishedNextTask==time);
+        }
+        public void AddTask(Command command, int time)
         {
             // Add task to the queue
             queue.AddCommand(command);
-
+            Update(time);
+           
         }
         /*public bool AddTask(Command command)
         {

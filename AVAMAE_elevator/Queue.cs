@@ -11,12 +11,10 @@ namespace AVAMAE_elevator
         {
             commands = new List<Command>();
         }
-        public List<int> GetFloorsToGo(int time, int floor)
+        
+        public Command GetNextTask(int time, int floor, int directionBefore)
         {
-            List <Command> commandsToGo = new List<Command>();
-            List<int> floorsToGo = new List<int>();
-
-            bool highestPriorityDirectionUp = true;
+            int highestPriorityDirection = 0;
             double highestPriority = -1;
 
             Command closestUp = commands[0];
@@ -26,74 +24,38 @@ namespace AVAMAE_elevator
 
             foreach (var command in commands)
             {
-               
-                double priotrity = command.GetPriority(time);
-                bool directionUp = command.GetDirectionUp(floor);
-                int deltaFloor = Math.Abs(command.GetTaskFloor() - floor);
-               
-                commandsToGo.Add(command);
-                floorsToGo.Add(command.GetTaskFloor());
+                double priority = command.GetPriority(time, this, floor, command.floorFrom);
 
-                if (HasSpace(floor, command.floorFrom) || command.PickedUp)
+
+                if (priority > 0)
                 {
-                    if (priotrity > highestPriority)
+
+                    int direction = command.GetDirection(floor+directionBefore);
+                    int deltaFloor = Math.Abs(command.GetTaskFloor() - floor);
+
+                    if (deltaFloor == 0)
                     {
-                        highestPriority = priotrity;
-                        highestPriorityDirectionUp = directionUp;
+                        return command;
                     }
-                }
-            }
-            return floorsToGo;
-        }
-        public Command GetNextTask(int time, int floor)
-        {
-            bool highestPriorityDirectionUp = true;
-            double highestPriority = -1;
-
-            Command closestUp = commands[0];
-            Command closestDown = commands[0];
-            int deltaUp = 99;
-            int deltaDown = 99;
-
-            foreach (var command in commands)
-            {
-                double priotrity = command.GetPriority(time);
-                if (command.id == 7999 || command.id == 49999 || command.id==699999)
-                {
-                    Console.WriteLine(command.id + " time="+time+ " " + priotrity);
-                }
-                //Console.Write(command.id + "here ");
-                if (commands.Count > 500)
-                {
-                    Console.WriteLine("Task " + command.id + " priority=" + priotrity);
-                }
-                bool directionUp = command.GetDirectionUp(floor);
-                int deltaFloor = Math.Abs(command.GetTaskFloor() - floor);
-
-                if (!HasSpace(floor, command.floorFrom) && !command.PickedUp)
-                {
-                    priotrity = 0;
-                }
-                else
-                {
-                    if (directionUp && deltaUp > deltaFloor)
+                    
+                    if (direction > 0 && deltaUp > deltaFloor)
                     {
                         closestUp = command;
                         deltaUp = deltaFloor;
                     }
-                    else if (!directionUp && deltaDown > deltaFloor)
+                    else if (direction < 0 && deltaDown > deltaFloor)
                     {
                         closestDown = command;
                         deltaDown = deltaFloor;
                     }
-                    if (priotrity > highestPriority)
+                    if (priority > highestPriority)
                     {
-                        highestPriority = priotrity;
-                        highestPriorityDirectionUp = directionUp;
+                        highestPriority = priority;
+                        highestPriorityDirection = direction;
                     }
                 }
             }
-            if (highestPriorityDirectionUp)
+            if (highestPriorityDirection>0)
             {
                 return closestUp;
             }
@@ -105,7 +67,7 @@ namespace AVAMAE_elevator
         public bool IsEmpty()
         {
 
-            return commands.Count ==0;
+            return commands.Count == 0;
         }
         public void NextStep(int time, int floor, bool doSimulation=false)
         {
@@ -116,25 +78,28 @@ namespace AVAMAE_elevator
                 {
                     if (floor == command.floorTo)
                     {
-                        /*if (!doSimulation)
+                        if (!doSimulation)
                         {
                             Console.WriteLine("Finished task for " + command.id + " in " + (time - command.timeStart) + "s (" + (command.timePickUp - command.timeStart) + "s to pick up, minimal time=" + command.MinimalExecutionTime() + ")");
-                        }*/
+                        }
                         commands.Remove(command);
                     }
                 }
             }
-            for (int i = commands.Count - 1; i >= 0; i--)
+            List<int> PickUp = new List<int>();
+            for (int i = 0; i < commands.Count; i++)
             {
                 Command command = commands[i];
 
-                if (!command.PickedUp && HasSpace(floor, command.floorFrom))
-                {
+                if (!command.PickedUp && HasSpace(floor, command))
+                {         
                     if (floor == command.floorFrom)
                     {
                         if (doSimulation)
                         {
-                            commands.Remove(command);
+                            //Console.WriteLine("Picked up " + command.id + " at floor " + command.floorFrom + " at " + time);
+
+                            PickUp.Add(i);
                         }
                         else
                         {
@@ -145,26 +110,50 @@ namespace AVAMAE_elevator
                     }
                 }
             }
+            if (PickUp.Count > 0) {
+                for (int i = PickUp.Count - 1; i >= 0; i--)
+                {
+                    //Console.Write(PickUp[i] + "id " +commands[PickUp[i]].id+" "+commands[PickUp[i]].PickedUp+",");
+                    commands.RemoveAt(PickUp[i]);
+                }
+                //Console.WriteLine();
+            }
+
         }
 
-        public bool HasSpace(int currentFloor, int floorTo)
+        public bool HasSpace(int currentFloor, Command command)
         {
-            int people = 0;
-            foreach (var command in commands)
+            int peopleInElevator = 0;
+            bool checkSelf = false;
+            foreach (var othercommand in commands)
             {
-                if (command.PickedUp)
+                if (command == othercommand)
                 {
-                    if (true)//((command.floorFrom < currentFloor) == (command.floorFrom < floorTo))
+                    checkSelf = true;
+                }
+                {
+
+                    if (othercommand.PickedUp)
                     {
-                        people += 1;
+                        // Only count people that will still be in the elvator
+                        if ((othercommand.floorTo < currentFloor) == (othercommand.floorTo < command.floorFrom ))
+                        {
+                            peopleInElevator += 1;
+                        }
+                        
+                    }
+                    else
+                    {
+                        // Add all people that will get in in the meantitime
+                        if ((othercommand.floorFrom < currentFloor) != (othercommand.floorFrom < command.floorFrom))
+                        {
+                            peopleInElevator += 1;
+                        }
+
                     }
                 }
             }
-            if (people > 8)
-            {
-                Console.WriteLine("Space=" + people + " of " + maxSpace);
-            }
-            return people < maxSpace;
+            return peopleInElevator < maxSpace;
         }
         public void AddCommand(Command Command)
         {
