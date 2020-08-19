@@ -15,6 +15,7 @@ namespace AVAMAE_elevator
         public void StoreAndPrintInfo(int time, ElevatorOutputs dataOutput)
         {
             // Function pritning the current state of the elvator and some additional info
+            // and writingthe elevator states to the ElevatorOutputs class
             CSVOutput data = new CSVOutput
             {
                 Time = time,
