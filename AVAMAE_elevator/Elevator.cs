@@ -11,7 +11,7 @@ namespace AVAMAE_elevator
         public int CurrentFloor { get; set; } = 0;
         public int Direction { get; set; } = 0;
         public bool AtFloor { get; set; } = true;
-        public int TimeMoveStart { get; set; } = -1;
+        public int TimeMoveStart { get; set; } = 0;
         public int TimeFinishedNextTask { get; set; } = -1;
 
         public Elevator()
@@ -49,7 +49,7 @@ namespace AVAMAE_elevator
             // Update the elevator position for the time time
             // If the elevator is simulated the task in pickup
             // state stop after picking up the person
-            if (TimeMoveStart <= time && TimeMoveStart != -1)
+            if (TimeMoveStart <= time && TimeMoveStart != 0)
             {
                 int levelBefore = CurrentFloor;
                 int deltaFloor = (time - TimeMoveStart - 1 + timeForFloor) / timeForFloor;
@@ -137,6 +137,7 @@ namespace AVAMAE_elevator
             // Add task to the queue
             queue.AddCommand(command);
             UpdateState(time);
+
            
         }
         /*public bool AddTask(Command command)

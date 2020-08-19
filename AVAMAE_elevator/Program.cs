@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
-
+using System.Configuration;
+using System.Collections.Specialized;
 
 namespace AVAMAE_elevator
 {
@@ -11,9 +11,11 @@ namespace AVAMAE_elevator
 
         static void Main(string[] args)
         {
-
             // Read the CSV data file
-            ElevatorInputs inputData = new ElevatorInputs("data.csv");
+            string inputFile = ConfigurationManager.AppSettings.Get("inputFile");
+
+            string outputFile = ConfigurationManager.AppSettings["outputFile"];
+            ElevatorInputs inputData = new ElevatorInputs(inputFile);
             ElevatorOutputs outputData = new ElevatorOutputs();
 
             //Initialise basics
@@ -33,13 +35,13 @@ namespace AVAMAE_elevator
                 while (inputData.RequestingNewTask(time))
                 {
                     Command nextCommand = new Command(inputData.ApplyNextCommand(), elevator.GetFloor());
-                    //Console.WriteLine("Task id: " + nextCommand.id + " requested at " + time);
+                    //Console.WriteLine("Task id: " + nextCommand.Id + " requested at " + time);
                     building.AddTask(nextCommand, time);
                 }
 
                 time++;
             }
-            outputData.SaveData("data_output.csv");
+            outputData.SaveData(outputFile);
         }
         
     }

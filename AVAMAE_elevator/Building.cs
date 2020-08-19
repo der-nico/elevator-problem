@@ -24,8 +24,8 @@ namespace AVAMAE_elevator
             {
                 data.PeopleInElevator.Add(command.Id);
             }
-            Console.Write($"State: t={time}");
-            Console.Write($", people id's={string.Join(", ",data.PeopleInElevator)}");
+            Console.Write($"State: t={time}, ");
+            Console.Write($"people id's={string.Join(", ",data.PeopleInElevator)}, ");
             Console.Write($" currentfloor={FirstElevator.GetFloor()}");
 
             if (!FirstElevator.queue.IsEmpty())
