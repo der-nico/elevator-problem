@@ -17,7 +17,7 @@ namespace AVAMAE_elevator
         public void SaveData(string filename)
         {
             using var w = new StreamWriter(filename);
-            w.WriteLine("Time, People in elevator, Elevator floor, Sorted queue)");
+            w.WriteLine("Time, People in elevator, Elevator floor, Sorted queue");
             w.Flush();
             foreach (CSVOutput data in OutputData)
             {
