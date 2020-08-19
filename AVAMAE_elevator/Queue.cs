@@ -1,52 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AVAMAE_elevator
 {
     public class Queue
     {
-        static int maxSpace = 8;
-        public List<Command> commands;
-        public Queue()
-        {
-            commands = new List<Command>();
-        }
-        
+        const int MaxSpace = 8;
+
+        public List<Command> Commands { get; set; } = new List<Command>();
+
         public Command GetNextTask(int time, int floor, int directionBefore)
         {
             int highestPriorityDirection = 0;
             double highestPriority = -1;
 
-            Command closestUp = commands[0];
-            Command closestDown = commands[0];
-            int deltaUp = 99;
-            int deltaDown = 99;
+            Command closestUp = Commands[0];
+            Command closestDown = Commands[0];
+            int minDeltaUp = 99;
+            int minDeltaDown = 99;
 
-            foreach (var command in commands)
+            foreach (var command in Commands)
             {
-                double priority = command.GetPriority(time, this, floor, command.floorFrom);
-
-
+                double priority = command.GetPriority(time, this, floor, command.FloorFrom);
                 if (priority > 0)
                 {
-
-                    int direction = command.GetDirection(floor+directionBefore);
-                    int deltaFloor = Math.Abs(command.GetTaskFloor() - floor);
+                    int direction = command.GetDirection(floor + directionBefore);
+                    int deltaFloor = Math.Abs(command.TaskFloor - floor);
 
                     if (deltaFloor == 0)
                     {
+                        //If the elevator is already on this floor we dont have to continue this loop
                         return command;
                     }
-                    
-                    if (direction > 0 && deltaUp > deltaFloor)
+                    if (direction > 0 && minDeltaUp > deltaFloor)
                     {
                         closestUp = command;
-                        deltaUp = deltaFloor;
+                        minDeltaUp = deltaFloor;
                     }
-                    else if (direction < 0 && deltaDown > deltaFloor)
+                    else if (direction < 0 && minDeltaDown > deltaFloor)
                     {
                         closestDown = command;
-                        deltaDown = deltaFloor;
+                        minDeltaDown = deltaFloor;
                     }
                     if (priority > highestPriority)
                     {
@@ -55,110 +50,80 @@ namespace AVAMAE_elevator
                     }
                 }
             }
-            if (highestPriorityDirection>0)
-            {
-                return closestUp;
-            }
-            else
-            {
-                return closestDown;
-            }
+            return highestPriorityDirection > 0 ? closestUp : closestDown;
         }
-        public bool IsEmpty()
-        {
+        public bool IsEmpty() => Commands.Count == 0;
 
-            return commands.Count == 0;
-        }
-        public void NextStep(int time, int floor, bool doSimulation=false)
+        public void NextStep(int time, int floor, bool doSimulation = false)
         {
-            for (int i = commands.Count - 1; i >= 0; i--)
+            // First let all people leave (in reverse order)
+            for (int i = Commands.Count - 1; i >= 0; i--)
             {
-                Command command = commands[i];
+                Command command = Commands[i];
                 if (command.PickedUp)
                 {
-                    if (floor == command.floorTo)
+                    if (floor == command.TaskFloor)
                     {
                         if (!doSimulation)
                         {
-                            Console.WriteLine("Finished task for " + command.id + " in " + (time - command.timeStart) + "s (" + (command.timePickUp - command.timeStart) + "s to pick up, minimal time=" + command.MinimalExecutionTime() + ")");
+                            Console.WriteLine($"Finished task for {command.Id} in {time - command.TimeStart}s ({command.TimePickUp - command.TimeStart}s to pick up, minimal time={ command.MinimalExecutionTime})");
                         }
-                        commands.Remove(command);
+                        Commands.Remove(command);
                     }
                 }
             }
             List<int> PickUp = new List<int>();
-            for (int i = 0; i < commands.Count; i++)
+            for (int i = 0; i < Commands.Count; i++)
             {
-                Command command = commands[i];
+                Command command = Commands[i];
 
                 if (!command.PickedUp && HasSpace(floor, command))
                 {         
-                    if (floor == command.floorFrom)
+                    if (floor == command.TaskFloor)
                     {
                         if (doSimulation)
                         {
-                            //Console.WriteLine("Picked up " + command.id + " at floor " + command.floorFrom + " at " + time);
-
                             PickUp.Add(i);
                         }
                         else
                         {
                             //Console.WriteLine("Picked up " + command.id + " at floor " + command.floorFrom + " at " + time);
                             command.PickedUp = true;
-                            command.timePickUp = time;
+                            command.TimePickUp = time;
                         }
                     }
                 }
             }
-            if (PickUp.Count > 0) {
+            if (PickUp.Count > 0)
+            {
                 for (int i = PickUp.Count - 1; i >= 0; i--)
                 {
-                    //Console.Write(PickUp[i] + "id " +commands[PickUp[i]].id+" "+commands[PickUp[i]].PickedUp+",");
-                    commands.RemoveAt(PickUp[i]);
+                    Commands.RemoveAt(PickUp[i]);
                 }
-                //Console.WriteLine();
             }
 
+        }
+        public bool IsInBetween(int staritngFloor, int endingFloor, Command command)
+        {
+            return ((staritngFloor < command.TaskFloor) == (endingFloor < command.TaskFloor));
         }
 
         public bool HasSpace(int currentFloor, Command command)
         {
             int peopleInElevator = 0;
-            bool checkSelf = false;
-            foreach (var othercommand in commands)
+            foreach (var otherCommand in Commands.Where((Command c) => c != command))
             {
-                if (command == othercommand)
+                // Only count people that will still be in the elvator
+                // Add all people that will get in in the meantitime
+                if (IsInBetween(currentFloor, otherCommand.FloorFrom, command) != otherCommand.PickedUp)
                 {
-                    checkSelf = true;
-                }
-                {
-
-                    if (othercommand.PickedUp)
-                    {
-                        // Only count people that will still be in the elvator
-                        if ((othercommand.floorTo < currentFloor) == (othercommand.floorTo < command.floorFrom ))
-                        {
-                            peopleInElevator += 1;
-                        }
-                        
-                    }
-                    else
-                    {
-                        // Add all people that will get in in the meantitime
-                        if ((othercommand.floorFrom < currentFloor) != (othercommand.floorFrom < command.floorFrom))
-                        {
-                            peopleInElevator += 1;
-                        }
-
-                    }
+                    peopleInElevator++;
                 }
             }
-            return peopleInElevator < maxSpace;
+            
+            return peopleInElevator < MaxSpace;
         }
-        public void AddCommand(Command Command)
-        {
-            commands.Add(Command);
-        }
+        public void AddCommand(Command Command) => Commands.Add(Command);
 
     }
 }

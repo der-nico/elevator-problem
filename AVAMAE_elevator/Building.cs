@@ -1,89 +1,67 @@
 ﻿using System;
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AVAMAE_elevator
 {
     public class Building
     {
-        public Elevator firstElevator;
+        public Elevator FirstElevator { get; set; } = new Elevator();
 
-        public Building()
-        {
-            firstElevator = new Elevator();
-            
-        }
 
-        public Elevator GetElevator()
-        {
-            return this.firstElevator;
-        }
+        public Elevator GetElevator() => FirstElevator;
 
-        public void PrintInfo(int time, ElevatorOutputs dataOutput)
+        public void StoreAndPrintInfo(int time, ElevatorOutputs dataOutput)
         {
             // Function pritning the current state of the elvator and some additional info
-            CSVOutput data = new CSVOutput();
-            data.time = time;
-            data.currentFloor = firstElevator.GetFloor();
-            foreach (var command in firstElevator.queue.commands)
+            CSVOutput data = new CSVOutput
             {
-                if (command.PickedUp)
-                {
-                    data.peopleInElevator.Add(command.id);
-                }
-            }
-            Console.Write("State: t=" + time);
-            Console.Write(", people id's=");
-            foreach (var id in data.peopleInElevator)
+                Time = time,
+                CurrentFloor = FirstElevator.GetFloor()
+            };
+            foreach (var command in FirstElevator.queue.Commands.Where((Command c) => c.PickedUp))
             {
-                Console.Write(id + ", ");
+                data.PeopleInElevator.Add(command.Id);
             }
-            Console.Write(" currentfloor=" + firstElevator.GetFloor());
+            Console.Write($"State: t={time}");
+            Console.Write($", people id's={string.Join(", ",data.PeopleInElevator)}");
+            Console.Write($" currentfloor={FirstElevator.GetFloor()}");
 
-            if (!firstElevator.queue.IsEmpty())
+            if (!FirstElevator.queue.IsEmpty())
             {
-                List<int> floors = GetOrderedListOfFloors(time, firstElevator);
+                List<int> floors = GetOrderedListOfFloors(time, FirstElevator);
                 foreach (var floorToGo in floors)
                 {
-                    data.sortedQueue.Add(floorToGo);
+                    data.SortedQueue.Add(floorToGo);
                 }
             }
-            Console.Write(", floorstogo=");
-            foreach (var floorToGo in data.sortedQueue)
-            {
-                Console.Write(floorToGo + ", ");
-            }
-            Console.WriteLine();
-            dataOutput.addData(data);
+            Console.WriteLine($", floorstogo={string.Join(", ", data.SortedQueue)}");
+            dataOutput.AddData(data);
         }
-        
-    
 
-        public void AddTask(Command command, int time)
-        {
-            // Adding the task to the elevator queue
-            // In more complex building this could decide which elevator get assigned the task
-            firstElevator.AddTask(command, time);
-        }
+        public void AddTask(Command command, int time) => FirstElevator.AddTask(command, time);
+
         public List<int> GetOrderedListOfFloors(int time, Elevator elevator)
         {
             // Simulate the behaviour of the elevaotr given the current open tasks
             // return the list of sorted floors the elevator is aiming at
-            Elevator simulatedElevator = new Elevator(elevator, time);
-            
+            //Copy the elvator using the same instance of the queue
+            Elevator simulatedElevator = elevator.Clone();
+            simulatedElevator.UpdateState(time);
+
             List<int> floors = new List<int>();
             
             while (!simulatedElevator.queue.IsEmpty())
             {
                 bool doSimulation = true;
-                bool hasMoved = false;
-
                 if (simulatedElevator.ArrivedAtFloor(time))
                 {
-                    simulatedElevator.Update(time, doSimulation);
+                    simulatedElevator.UpdateState(time, doSimulation);
                     floors.Add(simulatedElevator.GetFloor());
                 }
-                time += 1;
+                time++;
+
             }
             return floors;
         

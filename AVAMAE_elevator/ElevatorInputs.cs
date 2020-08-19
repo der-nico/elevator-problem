@@ -5,21 +5,21 @@ namespace AVAMAE_elevator
 {
     public class ElevatorInputs
     {
-
-        List<CSVinput> inputData = new List<CSVinput>();
-        int nextTaskTime;
+        public int NextTaskTime { get; set; }
+        public List<CSVinput> InputData { get; set; } = new List<CSVinput>();
 
         public ElevatorInputs()
         {
-            nextTaskTime = -1;
-        }
-        public ElevatorInputs(string filename)
-        {
-            inputData = ReadData(filename);
-            nextTaskTime = inputData[0].timeStart;
+            NextTaskTime = -1;
         }
 
-        List<CSVinput> ReadData(string filename)
+        public ElevatorInputs(string filename)
+        {
+            InputData = ReadData(filename);
+            NextTaskTime = InputData[0].TimeStart;
+        }
+
+        public List<CSVinput> ReadData(string filename)
         {
             using (StreamReader reader = new StreamReader(filename))
             {
@@ -30,39 +30,31 @@ namespace AVAMAE_elevator
                     var line = reader.ReadLine();
                     string[] values = line.Split(',');
                     CSVinput input = new CSVinput( int.Parse(values[0]), int.Parse(values[1]), int.Parse(values[2]), int.Parse(values[3]));
-                    inputData.Add(input);
+                    InputData.Add(input);
                 }
             }
-            return inputData;
+            return InputData;
         }
         public CSVinput ApplyNextCommand()
         {
             // Get the next command and remove it from inputlist
+            //Here i assume the commands are always sorted
             CSVinput NextTask = GetNextCommand();
-            inputData.RemoveAt(0);
-            if (!isEmpty())
+            InputData.RemoveAt(0);
+            if (!IsEmpty)
             {
-                nextTaskTime = inputData[0].timeStart;
+                NextTaskTime = InputData[0].TimeStart;
             }
             else
             {
-                nextTaskTime = -1;
+                NextTaskTime = -1;
             }
             return NextTask;
         }
-        public CSVinput GetNextCommand()
-        {
-            return inputData[0];
-        }
+        public CSVinput GetNextCommand() => InputData[0];
 
-        public bool isEmpty()
-        {
-            return inputData.Count == 0;
-        }
+        public bool IsEmpty => InputData.Count == 0;
 
-        public bool RequestingNewTask(int time)
-        {
-            return (time == nextTaskTime);
-        }
+        public bool RequestingNewTask(int time) => time == NextTaskTime;
     }
 }

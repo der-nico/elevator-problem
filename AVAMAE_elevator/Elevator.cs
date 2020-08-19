@@ -5,114 +5,101 @@ namespace AVAMAE_elevator
 {
     public class Elevator
     {
-        int currentFloor = 0;
-        int direction = 0;
-        bool atFloor = true;
-        int timeMoveStart = -1;
-        int timeFinishedNextTask = -1;
         public Queue queue;
         static int timeForFloor = 10;
 
+        public int CurrentFloor { get; set; } = 0;
+        public int Direction { get; set; } = 0;
+        public bool AtFloor { get; set; } = true;
+        public int TimeMoveStart { get; set; } = -1;
+        public int TimeFinishedNextTask { get; set; } = -1;
+
         public Elevator()
         {
-            // Default constructor
             queue = new Queue();
-            currentFloor = 0;
-            direction = 0;
+            CurrentFloor = 0;
+            Direction = 0;
         }
-        public Elevator(Elevator elevator, int time)
+        public Elevator Clone()
+        {
+            return new Elevator(this);
+
+        }
+        public Elevator(Elevator elevator)
         {
             // Copy constructor
-            currentFloor = elevator.currentFloor;
-            direction = elevator.direction;
-            atFloor = elevator.atFloor;
-            timeMoveStart = elevator.timeMoveStart;
+            CurrentFloor = elevator.CurrentFloor;
+            Direction = elevator.Direction;
+            AtFloor = elevator.AtFloor;
+            TimeMoveStart = elevator.TimeMoveStart;
             queue = new Queue();
-            foreach (var command in elevator.queue.commands)
+            foreach (var command in elevator.queue.Commands)
             {
                 queue.AddCommand(command);
             }
 
-            timeFinishedNextTask = GetNextTaskEndTime(time);
-
         }
 
-        public void Update(int time, bool doSimulation=false)
+        public bool IsAtFloor(int time)
+        {
+            return (time - TimeMoveStart) % timeForFloor == 0;
+        }
+        public void UpdateState(int time, bool doSimulation = false)
         {
             // Update the elevator position for the time time
             // If the elevator is simulated the task in pickup
             // state stop after picking up the person
-            if (timeMoveStart <= time && timeMoveStart != -1)
+            if (TimeMoveStart <= time && TimeMoveStart != -1)
             {
-                int levelBefore = currentFloor;
-                int deltaFloor = (time - timeMoveStart - 1 + timeForFloor) / (timeForFloor);
+                int levelBefore = CurrentFloor;
+                int deltaFloor = (time - TimeMoveStart - 1 + timeForFloor) / timeForFloor;
             
-                timeMoveStart += timeForFloor * deltaFloor;
-                if (direction > 0)
-                {
-                    currentFloor += deltaFloor;
-                }
-                else if (direction < 0)
-                {
-                    currentFloor -= deltaFloor;
-                }
-            
+                TimeMoveStart += timeForFloor * deltaFloor;
+
+                CurrentFloor += Direction * deltaFloor;
             }
-            atFloor = (time - timeMoveStart) % timeForFloor == 0;
-
-            if (atFloor)
+            
+            if (IsAtFloor(time))
             {
-                direction = 0;
-                timeMoveStart = -1;
+                Direction = 0;
+                TimeMoveStart = 0;
 
-                queue.NextStep(time, currentFloor, doSimulation);
+                queue.NextStep(time, CurrentFloor, doSimulation);
 
             }
             ExecuteNextTask(time);
-            timeFinishedNextTask = GetNextTaskEndTime(time);
+            TimeFinishedNextTask = GetNextTaskEndTime(time);
         }
 
-        public Command NextTask(int time)
-        {
-            // Get next task in queue
+        public Command NextTask(int time) => queue.GetNextTask(time, CurrentFloor, Direction);
 
-            return queue.GetNextTask(time, currentFloor, direction);
-        }
         public void ExecuteNextTask(int time)
         {
 
             if (queue.IsEmpty())
             {
-                direction = 0;
+                Direction = 0;
                 return;
             }
             Command task = NextTask(time);
-            if (timeMoveStart == -1)
+            if (TimeMoveStart == 0)
             {
-                timeMoveStart = time;
+                TimeMoveStart = time;
             }
-            int floorTask = -1;
-            if (task.PickedUp)
-            {
-                floorTask = task.floorTo;
-            }
-            else
-            {
-                floorTask = task.floorFrom;
-            }
+            int floorTask =task.TaskFloor;
 
-            if (floorTask > currentFloor)
+            if (floorTask > CurrentFloor)
             {
-                direction = 1;
+                Direction = 1;
             }
-            else if (floorTask< currentFloor)
+            else if (floorTask< CurrentFloor)
             {
-                direction = -1;
+                Direction = -1;
 
             }
             else
             {
-                direction = 0;
+                Direction = 0;
             }
         }
 
@@ -124,9 +111,9 @@ namespace AVAMAE_elevator
                 return 0;
             }
             Command task = NextTask(time);
-            int timeToComplete = task.GetExecutionTime(currentFloor);
+            int timeToComplete = task.GetExecutionTime(CurrentFloor);
 
-            timeToComplete += timeMoveStart - time;
+            timeToComplete += TimeMoveStart - time;
             return timeToComplete;
 
         }
@@ -139,17 +126,17 @@ namespace AVAMAE_elevator
 
         public int GetFloor()
         { 
-            return this.currentFloor;
+            return this.CurrentFloor;
         }
         public bool ArrivedAtFloor(int time)
         {
-            return (timeFinishedNextTask==time);
+            return (TimeFinishedNextTask==time);
         }
         public void AddTask(Command command, int time)
         {
             // Add task to the queue
             queue.AddCommand(command);
-            Update(time);
+            UpdateState(time);
            
         }
         /*public bool AddTask(Command command)
