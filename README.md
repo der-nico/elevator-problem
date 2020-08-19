@@ -22,7 +22,7 @@ In this prototype some additional output is printed to the screen.
 Everytime a task is finalised (the combination of picking up and dropping off) the total time spend on this task is shown.
 Additionally the time outside the elvator and the "minimal" exectuion time are printed. The minimal execution time is defined as the time it would take the levator to finish the task without considering any other tasks. See example below  
 
-``` Finished task for 15 in 269s (9s to pick up, minimal time=40)```
+``` Finished task for 46 in 48s (8s to pick up, minimal time=30) ```
 
 Everytime the elvator stops at a floor the current state is printed (identical to the inforamtion store in the output .csv. See example below:
 
