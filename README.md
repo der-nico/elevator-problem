@@ -1,5 +1,5 @@
 # elevator-problem
-The following repo contains the solution for a prototype of and elevator. 
+The following repository contains the solution for a prototype of and elevator. 
 The program simulates the behaviour of the elvator with given tasks
 
 The following classes are defined
