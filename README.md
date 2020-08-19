@@ -26,4 +26,8 @@ Everytime the elvator stops at a floor the current state is printed (identical t
 
 ``` State: t=425, people id's=20,  currentfloor=8, floorstogo=9, 8, 7, 6, 5, 10, 4, 3, 2```
 
+The executable is in the path bin/Release/netcoreapp3.1/publish/AVAMAE_elevator.dll and can be executed with:
+
+``` dotnet AVAMAE_elevator.dll```
+
 
