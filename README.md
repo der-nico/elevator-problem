@@ -9,7 +9,7 @@ The following classes are defined
 - Queue: The queue of the elevator containing all Commands currently not finsihed
 - Commands: A command containing the information: id of the person, when it was requested, from where it was requested and where it should go
 
-The input and output of the application is handeled by the ElevatorInputs and the ElevatorOutput classes each using the CSVInput and the CSVOutptt classes to read and store data.
+The input and output of the application is handeled by the ElevatorInputs and the ElevatorOutput classes each using the CSVInput and the CSVOutput classes to read and store data.
 The required input is a .csv file where its path is conifgured in the App.config configuration. After running the application the output is stored in a .csv defined in the configuration file. This output contains 4 comma separated columns: the time, a semicolonseparated list of people in the elevator, the current floor the elevator is at and a semicolon separted list of floors that are still requested (in the order they will be targeted).
 
 
