@@ -19,7 +19,11 @@ This change contains move the elevator floor accordingly to the time add new tas
 In this prototype some additional output is printed to the screen.
 Everytime a task is finalised (the combination of picking up and dropping off) the total time spend on this task is shown.
 Additionally the time outside the elvator and the "minimal" exectuion time are printed. The minimal execution time is defined as the time it would take the levator to finish the task without considering any other tasks. See example below  
+
 ``` Finished task for 15 in 269s (9s to pick up, minimal time=40)```
+
 Everytime the elvator stops at a floor the current state is printed (identical to the inforamtion store in the output .csv. See example below:
+
 ``` State: t=425, people id's=20,  currentfloor=8, floorstogo=9, 8, 7, 6, 5, 10, 4, 3, 2```
+
 
